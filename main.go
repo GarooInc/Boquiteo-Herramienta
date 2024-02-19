@@ -2,9 +2,8 @@ package main
 
 import (
 	"Boquiteo-Backend/configs"
-	"Boquiteo-Backend/responses"
+	"Boquiteo-Backend/routes"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CORS() gin.HandlerFunc {
@@ -31,13 +30,8 @@ func main() {
 	// MongoDB
 	configs.LoadSetup()
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, responses.StandardResponse{
-			Status:  http.StatusOK,
-			Message: "Service is up and running!",
-			Data:    nil,
-		})
-	})
+	// Routes
+	routes.Routes(r)
 
 	err := r.Run() // listen and serve on
 	if err != nil {
