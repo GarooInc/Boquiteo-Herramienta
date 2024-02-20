@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"Boquiteo-Backend/controllers"
 	"Boquiteo-Backend/responses"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,4 +15,6 @@ func Routes(router *gin.Engine) {
 			Data:    nil,
 		})
 	})
+
+	router.POST("/webhook", controllers.ReceiveWebhook)
 }
