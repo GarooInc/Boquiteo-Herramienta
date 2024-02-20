@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -48,13 +49,20 @@ func ReceiveWebhook(c *gin.Context) {
 			Data:    nil,
 		})
 		return
-
 	}
-	fmt.Println("Order number: ", orderNumber)
 
-	var totalPrice string
+	var totalPrice float64
 	if jsonTotalPrice, ok := jsonBody["total_price"]; ok {
-		totalPrice = jsonTotalPrice.(string)
+		totalPrice, err = strconv.ParseFloat(jsonTotalPrice.(string), 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, responses.StandardResponse{
+				Status:  http.StatusBadRequest,
+				Message: "Error while parsing the total price. " + err.Error(),
+				Data:    nil,
+			})
+			return
+
+		}
 	} else {
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
@@ -63,16 +71,8 @@ func ReceiveWebhook(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println("Total price: " + totalPrice)
-
-	c.JSON(http.StatusOK, responses.StandardResponse{
-		Status:  http.StatusOK,
-		Message: "Webhook received",
-		Data:    nil,
-	})
 
 	var customer string
-	// get jsonBody["customer"]["first_name"] and jsonBody["customer"]["last_name"] and concatenate them to customer
 	if jsonFirstName, ok := jsonBody["customer"].(map[string]interface{})["first_name"]; ok {
 		customer = jsonFirstName.(string)
 	} else {
@@ -82,7 +82,6 @@ func ReceiveWebhook(c *gin.Context) {
 			Data:    nil,
 		})
 		return
-
 	}
 	if jsonLastName, ok := jsonBody["customer"].(map[string]interface{})["last_name"]; ok {
 		customer += " " + jsonLastName.(string)
@@ -94,10 +93,8 @@ func ReceiveWebhook(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println("Customer: " + customer)
 
 	var lineItems []interface{} // [{"name": "item1", "quantity": 1, "price": 10.00, "vendor": "vendor1"}, ...]
-
 	if jsonLineItems, ok := jsonBody["line_items"]; ok {
 		for _, item := range jsonLineItems.([]interface{}) {
 			itemName := item.(map[string]interface{})["name"]
@@ -113,8 +110,6 @@ func ReceiveWebhook(c *gin.Context) {
 			})
 		}
 	}
-
-	fmt.Println("Line items: ", lineItems)
 
 	var address string
 	// get jsonBody["customer"]["default_address"]
@@ -132,10 +127,8 @@ func ReceiveWebhook(c *gin.Context) {
 		}
 	}
 	address = strings.ReplaceAll(address, "  ", " ") // replace double spaces with single space
-	fmt.Println("Address: ", address)
 
-	orderConfirmedTime := primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond))
-	fmt.Println("Order confirmed time: ", orderConfirmedTime)
+	var orderConfirmedTime = primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond))
 
 	// Insertar a la base de datos
 	var newOrder models.Order
@@ -160,7 +153,6 @@ func ReceiveWebhook(c *gin.Context) {
 		})
 		return
 	}
-
 	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 
 	c.JSON(http.StatusOK, responses.StandardResponse{
