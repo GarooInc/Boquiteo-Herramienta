@@ -141,6 +141,7 @@ func ReceiveWebhook(c *gin.Context) {
 	var newOrder models.Order
 
 	newOrder.OrderNumber = orderNumber
+	newOrder.Status = models.CONFIRMED
 	newOrder.TotalPrice = totalPrice
 	newOrder.Customer = customer
 	newOrder.LineItems = lineItems
