@@ -1,4 +1,4 @@
-localhost:8080/api/ping
+localhost:8080/api/
 Accept: application/json
 
 ### GET current orders

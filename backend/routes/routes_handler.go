@@ -8,9 +8,7 @@ import (
 )
 
 func Routes(router *gin.Engine) {
-	api := router.Group("/api")
-
-	api.GET("/ping", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, responses.StandardResponse{
 			Status:  http.StatusOK,
 			Message: "Service is up and running!",
@@ -18,6 +16,6 @@ func Routes(router *gin.Engine) {
 		})
 	})
 
-	api.POST("/webhook", controllers.ReceiveWebhook)
-	api.GET("/orders", controllers.GetCurrentOrders)
+	router.POST("/webhook", controllers.ReceiveWebhook)
+	router.GET("/orders", controllers.GetCurrentOrders)
 }
