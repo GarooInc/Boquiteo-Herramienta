@@ -5,6 +5,9 @@ Accept: application/json
 GET localhost:8080/orders HTTP/1.1
 accept: application/json
 
+### GET order by id
+GET localhost:8080/orders/52099 HTTP/1.1
+
 ### POST /webhook with customer data
 POST localhost:8080/webhook HTTP/1.1
 accept: application/json

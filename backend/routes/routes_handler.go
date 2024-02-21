@@ -18,4 +18,5 @@ func Routes(router *gin.Engine) {
 
 	router.POST("/webhook", controllers.ReceiveWebhook)
 	router.GET("/orders", controllers.GetCurrentOrders)
+	router.GET("/orders/:id", controllers.GetOrderById)
 }
