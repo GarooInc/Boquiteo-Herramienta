@@ -1,8 +1,12 @@
-localhost:8080/ping
+localhost:8080/api/ping
 Accept: application/json
 
+### GET current orders
+GET localhost:8080/api/orders HTTP/1.1
+accept: application/json
+
 ### POST /webhook with customer data
-POST localhost:8080/webhook HTTP/1.1
+POST localhost:8080/api/webhook HTTP/1.1
 accept: application/json
 Content-Type: application/json
 
@@ -488,7 +492,7 @@ Content-Type: application/json
 }
 
 ### POST /webhook with UberEats data
-POST localhost:8080/webhook HTTP/1.1
+POST localhost:8080/api/webhook HTTP/1.1
 accept: application/json
 Content-Type: application/json
 
@@ -825,7 +829,3 @@ Content-Type: application/json
   ]
 }
 
-
-### GET current orders
-GET localhost:8080/orders HTTP/1.1
-accept: application/json
