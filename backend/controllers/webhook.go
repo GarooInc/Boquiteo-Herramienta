@@ -94,20 +94,30 @@ func ReceiveWebhook(c *gin.Context) {
 		return
 	}
 
-	var lineItems []interface{} // [{"name": "item1", "quantity": 1, "price": 10.00, "vendor": "vendor1"}, ...]
+	var lineItems []models.OrderItem // [{"name": "item1", "quantity": 1, "price": 10.00, "vendor": "vendor1"}, ...]
 	if jsonLineItems, ok := jsonBody["line_items"]; ok {
 		for _, item := range jsonLineItems.([]interface{}) {
-			itemName := item.(map[string]interface{})["name"]
-			itemQuantity := item.(map[string]interface{})["quantity"]
-			itemPrice := item.(map[string]interface{})["price"]
-			itemVendor := item.(map[string]interface{})["vendor"]
+			itemName := item.(map[string]interface{})["name"].(string)
+			itemQuantity := item.(map[string]interface{})["quantity"].(int)
+			itemVendor := item.(map[string]interface{})["vendor"].(string)
+			itemPrice, err := strconv.ParseFloat(item.(map[string]interface{})["price"].(string), 64)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, responses.StandardResponse{
+					Status:  http.StatusBadRequest,
+					Message: "Error while parsing the item price. " + err.Error(),
+					Data:    nil,
+				})
+				return
+			}
 
-			lineItems = append(lineItems, map[string]interface{}{
-				"name":     itemName,
-				"quantity": itemQuantity,
-				"price":    itemPrice,
-				"vendor":   itemVendor,
-			})
+			item := models.OrderItem{
+				Name:     itemName,
+				Quantity: itemQuantity,
+				Price:    itemPrice,
+				Vendor:   itemVendor,
+			}
+
+			lineItems = append(lineItems, item)
 		}
 	}
 

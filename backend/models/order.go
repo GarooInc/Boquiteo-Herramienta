@@ -18,10 +18,17 @@ type Order struct {
 	Status             string             `json:"status" bson:"status"`
 	TotalPrice         float64            `json:"total_price" bson:"total_price"`
 	Customer           string             `json:"customer" bson:"customer"`
-	LineItems          []interface{}      `json:"line_items" bson:"line_items"`
+	LineItems          []OrderItem        `json:"line_items" bson:"line_items"`
 	Address            string             `json:"address" bson:"address"`
 	TimeOrderConfirmed primitive.DateTime `json:"time_order_confirmed" bson:"time_order_confirmed"`
 	TimeOrderFulfilled primitive.DateTime `json:"time_order_fulfilled,omitempty" bson:"time_order_fulfilled,omitempty"`
 	TimeOrderPickup    primitive.DateTime `json:"time_order_pickup,omitempty" bson:"time_order_pickup,omitempty"`
 	ShopifyDetails     interface{}        `json:"shopify_details" bson:"shopify_details"`
+}
+
+type OrderItem struct {
+	Name     string  `json:"name" bson:"name"`
+	Quantity int     `json:"quantity" bson:"quantity"`
+	Price    float64 `json:"price" bson:"price"`
+	Vendor   string  `json:"vendor" bson:"vendor"`
 }

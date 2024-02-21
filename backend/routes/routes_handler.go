@@ -17,4 +17,6 @@ func Routes(router *gin.Engine) {
 	})
 
 	router.POST("/webhook", controllers.ReceiveWebhook)
+
+	router.GET("/orders", controllers.GetCurrentOrders)
 }
