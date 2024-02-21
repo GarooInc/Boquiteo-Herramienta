@@ -96,9 +96,9 @@ func ReceiveWebhook(c *gin.Context) {
 
 	var lineItems []models.OrderItem // [{"name": "item1", "quantity": 1, "price": 10.00, "vendor": "vendor1"}, ...]
 	if jsonLineItems, ok := jsonBody["line_items"]; ok {
-		for _, item := range jsonLineItems.([]interface{}) {
-			itemName := item.(map[string]interface{})["name"].(string)
-			itemQuantity := item.(map[string]interface{})["quantity"].(int)
+		for i, item := range jsonLineItems.([]interface{}) {
+			itemName := item.(map[string]interface{})["title"].(string)
+			itemQuantity := item.(map[string]interface{})["quantity"].(float64)
 			itemVendor := item.(map[string]interface{})["vendor"].(string)
 			itemPrice, err := strconv.ParseFloat(item.(map[string]interface{})["price"].(string), 64)
 			if err != nil {
@@ -111,10 +111,12 @@ func ReceiveWebhook(c *gin.Context) {
 			}
 
 			item := models.OrderItem{
+				Item:     i,
 				Name:     itemName,
 				Quantity: itemQuantity,
 				Price:    itemPrice,
 				Vendor:   itemVendor,
+				Status:   models.ItemPending,
 			}
 
 			lineItems = append(lineItems, item)
@@ -144,7 +146,7 @@ func ReceiveWebhook(c *gin.Context) {
 	var newOrder models.Order
 
 	newOrder.OrderNumber = orderNumber
-	newOrder.Status = models.CONFIRMED
+	newOrder.Status = models.Confirmed
 	newOrder.TotalPrice = totalPrice
 	newOrder.Customer = customer
 	newOrder.LineItems = lineItems

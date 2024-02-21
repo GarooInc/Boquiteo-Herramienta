@@ -3,12 +3,14 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 const (
-	CONFIRMED  = "Confirmado"              // La orden ingresa al sistema
-	ALMOST     = "Casi listo"              // El primer plato de la orden está listo
-	DONE       = "Esperando al repartidor" // La orden está lista para ser recogida
-	DELIVERING = "En camino"               // La orden fue recogida por el repartidor
-	COMPLETED  = "Orden completada"        // La orden fue entregada
-	CANCELLED  = "Cancelado"               // La orden fue cancelada
+	Confirmed   = "Confirmado"              // La orden ingresa al sistema
+	Almost      = "Casi listo"              // El primer plato de la orden está listo
+	Done        = "Esperando al repartidor" // La orden está lista para ser recogida
+	Delivering  = "En camino"               // La orden fue recogida por el repartidor
+	Completed   = "Orden completada"        // La orden fue entregada
+	Cancelled   = "Cancelado"               // La orden fue cancelada
+	ItemPending = "Pendiente"               // El item de la orden está pendiente
+	ItemReady   = "Listo"                   // El item de la orden está listo
 )
 
 // Order struct para el modelo de datos de la orden
@@ -27,8 +29,10 @@ type Order struct {
 }
 
 type OrderItem struct {
+	Item     int     `json:"item" bson:"item"` // ID del item dentro de la orden
 	Name     string  `json:"name" bson:"name"`
-	Quantity int     `json:"quantity" bson:"quantity"`
+	Quantity float64 `json:"quantity" bson:"quantity"`
 	Price    float64 `json:"price" bson:"price"`
 	Vendor   string  `json:"vendor" bson:"vendor"`
+	Status   string  `json:"status" bson:"status"`
 }
