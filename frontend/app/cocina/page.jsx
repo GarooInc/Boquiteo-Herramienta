@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react'
 import NavBar from '@/components/NavBar/NavBar';
 
 
-const principalPage = () => {
+const PageCocina = () => {
     const [data , setData] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -83,4 +83,4 @@ const principalPage = () => {
   )
 }
 
-export default principalPage
+export default PageCocina
