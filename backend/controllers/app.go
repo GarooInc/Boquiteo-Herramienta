@@ -59,6 +59,15 @@ func GetCurrentOrders(c *gin.Context) {
 	})
 }
 
+// GetOrderById
+// @Summary Obtener una orden por su id
+// @Description Obtiene una orden por su id
+// @ID get-order-by-id
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Order ID"
+// @Success 200 {object} responses.StandardResponse
+// @Router /orders/{id} [get]
 func GetOrderById(c *gin.Context) {
 	// Obtener el id del parámetro, y convertirlo a int64
 	orderId, err := strconv.ParseInt(c.Param("id"), 10, 64)

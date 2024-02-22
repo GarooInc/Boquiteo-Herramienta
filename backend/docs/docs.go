@@ -35,6 +35,36 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/orders/{id}": {
+            "get": {
+                "description": "Obtiene una orden por su id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Obtener una orden por su id",
+                "operationId": "get-order-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StandardResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -112,6 +142,21 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.Order"
                     }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "responses.StandardResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "message": {
                     "type": "string"

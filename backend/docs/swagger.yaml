@@ -55,6 +55,16 @@ definitions:
       status:
         type: integer
     type: object
+  responses.StandardResponse:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -73,4 +83,24 @@ paths:
           schema:
             $ref: '#/definitions/responses.OrderResponse'
       summary: Obtener todas las órdenes actuales
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una orden por su id
+      operationId: get-order-by-id
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.StandardResponse'
+      summary: Obtener una orden por su id
 swagger: "2.0"
