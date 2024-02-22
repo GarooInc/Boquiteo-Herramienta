@@ -30,7 +30,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.OrderResponse"
+                            "$ref": "#/definitions/responses.MultiOrderResponse"
                         }
                     }
                 }
@@ -60,7 +60,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.StandardResponse"
+                            "$ref": "#/definitions/responses.OrderResponse"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.OrderResponse": {
+        "responses.MultiOrderResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -151,12 +151,11 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.StandardResponse": {
+        "responses.OrderResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "$ref": "#/definitions/models.Order"
                 },
                 "message": {
                     "type": "string"

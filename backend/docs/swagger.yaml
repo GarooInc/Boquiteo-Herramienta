@@ -44,7 +44,7 @@ definitions:
       vendor:
         type: string
     type: object
-  responses.OrderResponse:
+  responses.MultiOrderResponse:
     properties:
       data:
         items:
@@ -55,11 +55,10 @@ definitions:
       status:
         type: integer
     type: object
-  responses.StandardResponse:
+  responses.OrderResponse:
     properties:
       data:
-        additionalProperties: true
-        type: object
+        $ref: '#/definitions/models.Order'
       message:
         type: string
       status:
@@ -81,7 +80,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.OrderResponse'
+            $ref: '#/definitions/responses.MultiOrderResponse'
       summary: Obtener todas las órdenes actuales
   /orders/{id}:
     get:
@@ -101,6 +100,6 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.StandardResponse'
+            $ref: '#/definitions/responses.OrderResponse'
       summary: Obtener una orden por su id
 swagger: "2.0"
