@@ -38,7 +38,7 @@ const PrincipalPage = () => {
                 <input
                     type='text'
                     placeholder='Buscar orden'
-                    className='w-2/3 m-4 p-2 rounded-md'
+                    className='w-2/3 m-4 p-2 rounded-md border-2 border-dark-gray'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -57,13 +57,13 @@ const PrincipalPage = () => {
                                         item.line_items.map((line_item, index) => {
                                             return (
                                                 <div key={index} className='flex flex-col border-b-2 border-dark-gray w-full p-2'>
-                                                    <p className='text-lg'>{line_item.name}</p>
+                                                    <p className='text-lg bg-light-gray rounded-md'>{line_item.name}</p>
                                                     <p className='text-lg text-gray'>Cocina: {line_item.vendor}</p>
                                                     <div className='flex flex-row justify-between'>
-                                                        <p className='text-lg'>Qty: {line_item.quantity}</p>
+                                                        <p className='text-lg font-bold'>Qty: {line_item.quantity}</p>
                                                         <p className='text-lg font-bold'>Q{line_item.price}</p>
                                                     </div>
-                                                    <p className='text-lg'>{line_item.status}</p>
+                                                    <p className='text-lg text-dark-gray'>Status: {line_item.status}</p>
                                                 </div>
                                             )
 
