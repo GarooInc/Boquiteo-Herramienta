@@ -2,8 +2,11 @@ package main
 
 import (
 	"Boquiteo-Backend/configs"
+	docs "Boquiteo-Backend/docs"
 	"Boquiteo-Backend/routes"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func CORS() gin.HandlerFunc {
@@ -30,7 +33,16 @@ func main() {
 	// MongoDB
 	configs.LoadSetup()
 
+	// Swagger
+	docs.SwaggerInfo.Title = "Boquiteo API"
+	docs.SwaggerInfo.Description = "API para la automatización de órdenes de Boquiteo"
+	docs.SwaggerInfo.Version = "0.1.0"
+	docs.SwaggerInfo.Host = "boquiteo-garoo.koyeb.app/api"
+	docs.SwaggerInfo.BasePath = "/"
+
 	// Routes
+	//urlSwagger := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	routes.Routes(r)
 
 	err := r.Run() // listen and serve on

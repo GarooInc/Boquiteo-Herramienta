@@ -9,6 +9,12 @@ type StandardResponse struct {
 }
 
 type OrderResponse struct {
+	Status  int          `json:"status"`
+	Message string       `json:"message"`
+	Data    models.Order `json:"data"`
+}
+
+type MultiOrderResponse struct {
 	Status  int            `json:"status"`
 	Message string         `json:"message"`
 	Data    []models.Order `json:"data"`

@@ -10,6 +10,14 @@ import (
 	"strconv"
 )
 
+// GetCurrentOrders
+// @Summary Obtener todas las órdenes actuales
+// @Description Obtiene todas las órdenes actuales, excluyendo las canceladas y completadas
+// @ID get-current-orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} responses.MultiOrderResponse
+// @Router /orders [get]
 func GetCurrentOrders(c *gin.Context) {
 	var orders []models.Order
 
@@ -44,13 +52,22 @@ func GetCurrentOrders(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, responses.OrderResponse{
+	c.JSON(http.StatusOK, responses.MultiOrderResponse{
 		Status:  http.StatusOK,
 		Message: "Orders fetched successfully",
 		Data:    ordersFiltered,
 	})
 }
 
+// GetOrderById
+// @Summary Obtener una orden por su id
+// @Description Obtiene una orden por su id
+// @ID get-order-by-id
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Order ID"
+// @Success 200 {object} responses.OrderResponse
+// @Router /orders/{id} [get]
 func GetOrderById(c *gin.Context) {
 	// Obtener el id del parámetro, y convertirlo a int64
 	orderId, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -78,18 +95,19 @@ func GetOrderById(c *gin.Context) {
 		return
 	}
 
-	order.ShopifyDetails = nil // No se envía la información de Shopify
+	var responseOrder = models.Order{
+		ID:          order.ID,
+		OrderNumber: order.OrderNumber,
+		Status:      order.Status,
+		TotalPrice:  order.TotalPrice,
+		Customer:    order.Customer,
+		LineItems:   order.LineItems,
+		Address:     order.Address,
+	}
 
-	c.JSON(http.StatusOK, responses.StandardResponse{
+	c.JSON(http.StatusOK, responses.OrderResponse{
 		Status:  http.StatusOK,
 		Message: "Order fetched successfully",
-		Data: map[string]interface{}{
-			"order_number": order.OrderNumber,
-			"status":       order.Status,
-			"total_price":  order.TotalPrice,
-			"customer":     order.Customer,
-			"line_items":   order.LineItems,
-			"address":      order.Address,
-		},
+		Data:    responseOrder,
 	})
 }

@@ -1,0 +1,105 @@
+definitions:
+  models.Order:
+    properties:
+      _id:
+        type: string
+      address:
+        type: string
+      customer:
+        type: string
+      line_items:
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
+      order_number:
+        type: integer
+      shopify_details: {}
+      status:
+        type: string
+      time_order_confirmed:
+        format: date-time
+        type: string
+      time_order_fulfilled:
+        format: date-time
+        type: string
+      time_order_pickup:
+        format: date-time
+        type: string
+      total_price:
+        type: number
+    type: object
+  models.OrderItem:
+    properties:
+      item:
+        description: ID del item dentro de la orden
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: number
+      status:
+        type: string
+      vendor:
+        type: string
+    type: object
+  responses.MultiOrderResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Order'
+        type: array
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  responses.OrderResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Order'
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las órdenes actuales, excluyendo las canceladas y
+        completadas
+      operationId: get-current-orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MultiOrderResponse'
+      summary: Obtener todas las órdenes actuales
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una orden por su id
+      operationId: get-order-by-id
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.OrderResponse'
+      summary: Obtener una orden por su id
+swagger: "2.0"
