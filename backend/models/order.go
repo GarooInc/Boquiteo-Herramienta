@@ -22,9 +22,9 @@ type Order struct {
 	Customer           string             `json:"customer" bson:"customer"`
 	LineItems          []OrderItem        `json:"line_items" bson:"line_items"`
 	Address            string             `json:"address" bson:"address"`
-	TimeOrderConfirmed primitive.DateTime `json:"time_order_confirmed" bson:"time_order_confirmed"`
-	TimeOrderFulfilled primitive.DateTime `json:"time_order_fulfilled,omitempty" bson:"time_order_fulfilled,omitempty"`
-	TimeOrderPickup    primitive.DateTime `json:"time_order_pickup,omitempty" bson:"time_order_pickup,omitempty"`
+	TimeOrderConfirmed primitive.DateTime `json:"time_order_confirmed" bson:"time_order_confirmed" swaggertype:"string" format:"date-time"`
+	TimeOrderFulfilled primitive.DateTime `json:"time_order_fulfilled,omitempty" bson:"time_order_fulfilled,omitempty" swaggertype:"string" format:"date-time"`
+	TimeOrderPickup    primitive.DateTime `json:"time_order_pickup,omitempty" bson:"time_order_pickup,omitempty" swaggertype:"string" format:"date-time"`
 	ShopifyDetails     interface{}        `json:"shopify_details" bson:"shopify_details"`
 }
 

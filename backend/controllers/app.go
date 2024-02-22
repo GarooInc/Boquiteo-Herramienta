@@ -10,6 +10,14 @@ import (
 	"strconv"
 )
 
+// GetCurrentOrders
+// @Summary Obtener todas las órdenes actuales
+// @Description Obtiene todas las órdenes actuales, excluyendo las canceladas y completadas
+// @ID get-current-orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} responses.OrderResponse
+// @Router /orders [get]
 func GetCurrentOrders(c *gin.Context) {
 	var orders []models.Order
 
