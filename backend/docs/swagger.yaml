@@ -1,4 +1,14 @@
 definitions:
+  controllers.UpdateItemRequest:
+    description: Estructura de la solicitud para actualizar el estado de un item
+    properties:
+      item_id:
+        type: integer
+      item_ready:
+        type: boolean
+      order_id:
+        type: integer
+    type: object
   models.Order:
     properties:
       _id:
@@ -64,9 +74,41 @@ definitions:
       status:
         type: integer
     type: object
+  responses.StandardResponse:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
+  /kitchen/orders/items:
+    put:
+      consumes:
+      - application/json
+      description: (Cocina) Actualiza el estado de un item, si está listo o no. False
+        para 'Pendiente', true para 'Listo'.
+      operationId: update-item-ready
+      parameters:
+      - description: Update Item Request
+        in: body
+        name: updateItemRequest
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.StandardResponse'
+      summary: Actualizar el estado de un item
   /orders:
     get:
       consumes:

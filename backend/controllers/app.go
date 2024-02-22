@@ -111,3 +111,92 @@ func GetOrderById(c *gin.Context) {
 		Data:    responseOrder,
 	})
 }
+
+// UpdateItemRequest
+// @Description Estructura de la solicitud para actualizar el estado de un item
+type UpdateItemRequest struct {
+	OrderId   int  `json:"order_id"`
+	ItemId    int  `json:"item_id"`
+	ItemReady bool `json:"item_ready"`
+}
+
+// UpdateItemReady
+// @Summary Actualizar el estado de un item
+// @Description (Cocina) Actualiza el estado de un item, si está listo o no. False para 'Pendiente', true para 'Listo'.
+// @ID update-item-ready
+// @Accept  json
+// @Produce  json
+// @Param updateItemRequest body UpdateItemRequest true "Update Item Request"
+// @Success 200 {object} responses.StandardResponse
+// @Router /kitchen/orders/items [put]
+func UpdateItemReady(c *gin.Context) {
+	var updateItemRequest UpdateItemRequest
+	err := c.BindJSON(&updateItemRequest)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, responses.StandardResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid request." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// Obtener la orden
+	var order models.Order
+
+	collection := configs.GetCollection(configs.DB, "orders")
+	err = collection.FindOne(c, bson.M{"order_number": updateItemRequest.OrderId}).Decode(&order)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// Encontrar el item
+	var itemIndex = -1
+	for i, item := range order.LineItems {
+		if item.Item == updateItemRequest.ItemId {
+			itemIndex = i
+			break
+		}
+	}
+
+	if itemIndex == -1 {
+		c.JSON(http.StatusNotFound, responses.StandardResponse{
+			Status:  http.StatusNotFound,
+			Message: "Item not found in the order.",
+			Data:    nil,
+		})
+		return
+	}
+
+	// Actualizar el item
+	if updateItemRequest.ItemReady {
+		order.LineItems[itemIndex].Status = models.ItemReady
+	} else {
+		order.LineItems[itemIndex].Status = models.ItemPending
+	}
+
+	// Actualizar la orden en la base de datos
+	_, err = collection.UpdateOne(c, bson.M{"order_number": updateItemRequest.OrderId}, bson.M{"$set": bson.M{"line_items": order.LineItems}})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while updating order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, responses.StandardResponse{
+		Status:  http.StatusOK,
+		Message: "Item updated successfully to '" + order.LineItems[itemIndex].Status + "'",
+		Data:    nil,
+	})
+}

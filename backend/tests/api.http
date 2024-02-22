@@ -8,6 +8,17 @@ accept: application/json
 ### GET order by id
 GET localhost:8080/orders/52099 HTTP/1.1
 
+### PUT update item status
+PUT localhost:8080/kitchen/orders/items HTTP/1.1
+accept: application/json
+Content-Type: application/json
+
+{
+  "order_id": 52099,
+  "item_id": 0,
+  "item_ready": true
+}
+
 ### POST /webhook with customer data
 POST localhost:8080/webhook HTTP/1.1
 accept: application/json

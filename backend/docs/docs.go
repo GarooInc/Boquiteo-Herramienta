@@ -15,6 +15,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/kitchen/orders/items": {
+            "put": {
+                "description": "(Cocina) Actualiza el estado de un item, si está listo o no. False para 'Pendiente', true para 'Listo'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Actualizar el estado de un item",
+                "operationId": "update-item-ready",
+                "parameters": [
+                    {
+                        "description": "Update Item Request",
+                        "name": "updateItemRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.UpdateItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StandardResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/orders": {
             "get": {
                 "description": "Obtiene todas las órdenes actuales, excluyendo las canceladas y completadas",
@@ -68,6 +100,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controllers.UpdateItemRequest": {
+            "description": "Estructura de la solicitud para actualizar el estado de un item",
+            "type": "object",
+            "properties": {
+                "item_id": {
+                    "type": "integer"
+                },
+                "item_ready": {
+                    "type": "boolean"
+                },
+                "order_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Order": {
             "type": "object",
             "properties": {
@@ -156,6 +203,21 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/models.Order"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "responses.StandardResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "message": {
                     "type": "string"
