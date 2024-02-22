@@ -33,6 +33,7 @@ module.exports = {
       colors: {
         'orange': '#F95E07',
         'light-gray': '#F5F5F6',
+        'gray': '#797B7E',
         "dark-gray": "#333331",
       },
     },
