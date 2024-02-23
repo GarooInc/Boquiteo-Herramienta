@@ -23,7 +23,13 @@ func Routes(router *gin.Engine) {
 
 	kitchen := router.Group("/kitchen")
 	{
+		kitchen.GET("/orders", controllers.GetPendingOrders)
 		kitchen.PUT("/orders/items", controllers.UpdateItemReady)
 		kitchen.PUT("/orders", controllers.SetOrderStatusKitchen)
+	}
+
+	delivery := router.Group("/delivery")
+	{
+		delivery.GET("/orders", controllers.GetWaitingOrders)
 	}
 }

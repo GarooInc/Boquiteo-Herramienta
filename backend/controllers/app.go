@@ -59,6 +59,98 @@ func GetCurrentOrders(c *gin.Context) {
 	})
 }
 
+// GetPendingOrders
+// @Summary Obtener todas las órdenes pendientes
+// @Description (Cocina) Obtiene todas las órdenes con status 'Confirmed' o 'Almost' que solo se mostrarán en la cocina
+// @ID get-pending-orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} responses.MultiOrderResponse
+// @Router /kitchen/orders [get]
+func GetPendingOrders(c *gin.Context) {
+	// regresar todas las ordenes con status Confirmed o Almost
+	var orders []models.Order
+
+	collection := configs.GetCollection(configs.DB, "orders")
+	cursor, err := collection.Find(c, bson.M{"status": bson.M{"$in": []string{models.Confirmed, models.Almost}}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching orders." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	if err = cursor.All(c, &orders); err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching orders." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	var filteredOrders []models.Order
+
+	for _, order := range orders {
+		order.ShopifyDetails = nil // No se envía la información de Shopify
+		filteredOrders = append(filteredOrders, order)
+	}
+
+	c.JSON(http.StatusOK, responses.MultiOrderResponse{
+		Status:  http.StatusOK,
+		Message: "Orders fetched successfully",
+		Data:    filteredOrders,
+	})
+}
+
+// GetWaitingOrders
+// @Summary Obtener todas las órdenes esperando al repartidor
+// @Description (Delivery) Obtiene todas las órdenes con status 'Done' que solo se mostrarán en la sección de repartidor
+// @ID get-waiting-orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} responses.MultiOrderResponse
+// @Router /delivery/orders [get]
+func GetWaitingOrders(c *gin.Context) {
+	// regresar todas las ordenes con status Done
+	var orders []models.Order
+
+	collection := configs.GetCollection(configs.DB, "orders")
+	cursor, err := collection.Find(c, bson.M{"status": models.Done})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching orders." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	if err = cursor.All(c, &orders); err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching orders." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	var filteredOrders []models.Order
+
+	for _, order := range orders {
+		order.ShopifyDetails = nil // No se envía la información de Shopify
+		filteredOrders = append(filteredOrders, order)
+	}
+
+	c.JSON(http.StatusOK, responses.MultiOrderResponse{
+		Status:  http.StatusOK,
+		Message: "Orders fetched successfully",
+		Data:    filteredOrders,
+	})
+}
+
 // GetOrderById
 // @Summary Obtener una orden por su id
 // @Description Obtiene una orden por su id

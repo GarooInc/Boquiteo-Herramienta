@@ -5,6 +5,14 @@ Accept: application/json
 GET localhost:8080/orders HTTP/1.1
 accept: application/json
 
+### GET current orders for kitchen
+GET localhost:8080/kitchen/orders HTTP/1.1
+accept: application/json
+
+### GET current orders for delivery
+GET localhost:8080/delivery/orders HTTP/1.1
+accept: application/json
+
 ### GET order by id
 GET localhost:8080/orders/52099 HTTP/1.1
 

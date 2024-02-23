@@ -95,6 +95,20 @@ info:
   contact: {}
 paths:
   /kitchen/orders:
+    get:
+      consumes:
+      - application/json
+      description: (Cocina) Obtiene todas las órdenes con status 'Confirmed' o 'Almost'
+        que solo se mostrarán en la cocina
+      operationId: get-pending-orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MultiOrderResponse'
+      summary: Obtener todas las órdenes pendientes
     put:
       consumes:
       - application/json

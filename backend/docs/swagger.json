@@ -5,6 +5,25 @@
     },
     "paths": {
         "/kitchen/orders": {
+            "get": {
+                "description": "(Cocina) Obtiene todas las órdenes con status 'Confirmed' o 'Almost' que solo se mostrarán en la cocina",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Obtener todas las órdenes pendientes",
+                "operationId": "get-pending-orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MultiOrderResponse"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "(Cocina) Actualiza el estado de una orden. True para 'Listo', falso para 'Casi listo' o 'Confirmado' dependiendo del estado de los items.",
                 "consumes": [
