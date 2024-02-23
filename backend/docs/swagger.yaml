@@ -9,6 +9,13 @@ definitions:
       order_id:
         type: integer
     type: object
+  controllers.UpdateOrderStatusRequest:
+    properties:
+      order_id:
+        type: integer
+      status:
+        type: boolean
+    type: object
   models.Order:
     properties:
       _id:
@@ -87,6 +94,28 @@ definitions:
 info:
   contact: {}
 paths:
+  /kitchen/orders:
+    put:
+      consumes:
+      - application/json
+      description: (Cocina) Actualiza el estado de una orden. True para 'Listo', falso
+        para 'Casi listo' o 'Confirmado' dependiendo del estado de los items.
+      operationId: set-order-status-kitchen
+      parameters:
+      - description: Update Order Status Request
+        in: body
+        name: updateOrderStatusRequest
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.StandardResponse'
+      summary: Actualizar el estado de una orden en la cocina
   /kitchen/orders/items:
     put:
       consumes:

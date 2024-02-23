@@ -178,12 +178,32 @@ func UpdateItemReady(c *gin.Context) {
 	// Actualizar el item
 	if updateItemRequest.ItemReady {
 		order.LineItems[itemIndex].Status = models.ItemReady
+
+		if order.Status == models.Confirmed {
+			order.Status = models.Almost
+		}
+
 	} else {
 		order.LineItems[itemIndex].Status = models.ItemPending
+
+		// Si hay al menos un item Listo, la orden pasa a 'Casi listo'. Si no, a 'Confirmado'
+		almost := false
+		for _, item := range order.LineItems {
+			if item.Status == models.ItemReady {
+				almost = true
+				break
+			}
+		}
+
+		if almost {
+			order.Status = models.Almost
+		} else {
+			order.Status = models.Confirmed
+		}
 	}
 
 	// Actualizar la orden en la base de datos
-	_, err = collection.UpdateOne(c, bson.M{"order_number": updateItemRequest.OrderId}, bson.M{"$set": bson.M{"line_items": order.LineItems}})
+	_, err = collection.UpdateOne(c, bson.M{"order_number": updateItemRequest.OrderId}, bson.M{"$set": bson.M{"line_items": order.LineItems, "status": order.Status}})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
@@ -196,7 +216,101 @@ func UpdateItemReady(c *gin.Context) {
 
 	c.JSON(http.StatusOK, responses.StandardResponse{
 		Status:  http.StatusOK,
-		Message: "Item updated successfully to '" + order.LineItems[itemIndex].Status + "'",
+		Message: "Item updated successfully to '" + order.LineItems[itemIndex].Status + "', order status: '" + order.Status + "'",
+		Data:    nil,
+	})
+}
+
+type UpdateOrderStatusRequest struct {
+	OrderId int  `json:"order_id"`
+	Status  bool `json:"status"`
+}
+
+// SetOrderStatusKitchen
+// @Summary Actualizar el estado de una orden en la cocina
+// @Description (Cocina) Actualiza el estado de una orden. True para 'Listo', falso para 'Casi listo' o 'Confirmado' dependiendo del estado de los items.
+// @ID set-order-status-kitchen
+// @Accept  json
+// @Produce  json
+// @Param updateOrderStatusRequest body UpdateOrderStatusRequest true "Update Order Status Request"
+// @Success 200 {object} responses.StandardResponse
+// @Router /kitchen/orders [put]
+func SetOrderStatusKitchen(c *gin.Context) {
+	var updateOrderStatusRequest UpdateOrderStatusRequest
+	err := c.BindJSON(&updateOrderStatusRequest)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, responses.StandardResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid request." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// Obtener la orden
+	var order models.Order
+
+	collection := configs.GetCollection(configs.DB, "orders")
+	err = collection.FindOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}).Decode(&order)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// status = true -> Done
+	// status = false -> Almost / Confirmed
+	if updateOrderStatusRequest.Status {
+		// Verificar que todos los items estén listos
+		for _, item := range order.LineItems {
+			if item.Status != models.ItemReady {
+				c.JSON(http.StatusBadRequest, responses.StandardResponse{
+					Status:  http.StatusBadRequest,
+					Message: "Not all items are ready.",
+					Data:    nil,
+				})
+				return
+			}
+		}
+
+		order.Status = models.Done
+	} else {
+		// Si hay al menos un item Listo, la orden pasa a 'Casi listo'. Si no, a 'Confirmado'
+		almost := false
+		for _, item := range order.LineItems {
+			if item.Status == models.ItemReady {
+				almost = true
+				break
+			}
+		}
+
+		if almost {
+			order.Status = models.Almost
+		} else {
+			order.Status = models.Confirmed
+		}
+	}
+
+	// Actualizar la orden en la base de datos
+	_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status}})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while updating order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, responses.StandardResponse{
+		Status:  http.StatusOK,
+		Message: "Order updated successfully to '" + order.Status + "'",
 		Data:    nil,
 	})
 }

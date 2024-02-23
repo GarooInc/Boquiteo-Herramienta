@@ -24,5 +24,6 @@ func Routes(router *gin.Engine) {
 	kitchen := router.Group("/kitchen")
 	{
 		kitchen.PUT("/orders/items", controllers.UpdateItemReady)
+		kitchen.PUT("/orders", controllers.SetOrderStatusKitchen)
 	}
 }

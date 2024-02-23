@@ -15,6 +15,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/kitchen/orders": {
+            "put": {
+                "description": "(Cocina) Actualiza el estado de una orden. True para 'Listo', falso para 'Casi listo' o 'Confirmado' dependiendo del estado de los items.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Actualizar el estado de una orden en la cocina",
+                "operationId": "set-order-status-kitchen",
+                "parameters": [
+                    {
+                        "description": "Update Order Status Request",
+                        "name": "updateOrderStatusRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StandardResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/kitchen/orders/items": {
             "put": {
                 "description": "(Cocina) Actualiza el estado de un item, si está listo o no. False para 'Pendiente', true para 'Listo'.",
@@ -112,6 +144,17 @@ const docTemplate = `{
                 },
                 "order_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "controllers.UpdateOrderStatusRequest": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "boolean"
                 }
             }
         },

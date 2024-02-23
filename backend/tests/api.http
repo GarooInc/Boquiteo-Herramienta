@@ -14,9 +14,19 @@ accept: application/json
 Content-Type: application/json
 
 {
-  "order_id": 52099,
+  "order_id": 52086,
   "item_id": 0,
   "item_ready": true
+}
+
+### PUT update order status from kitchen
+PUT localhost:8080/kitchen/orders HTTP/1.1
+accept: application/json
+Content-Type: application/json
+
+{
+  "order_id": 52086,
+  "status": false
 }
 
 ### POST /webhook with customer data
