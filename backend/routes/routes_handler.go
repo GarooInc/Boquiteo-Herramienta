@@ -31,5 +31,6 @@ func Routes(router *gin.Engine) {
 	delivery := router.Group("/delivery")
 	{
 		delivery.GET("/orders", controllers.GetWaitingOrders)
+		delivery.PUT("/orders", controllers.SetOrderStatusDelivery)
 	}
 }

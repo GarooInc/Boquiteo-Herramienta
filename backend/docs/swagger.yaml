@@ -94,6 +94,42 @@ definitions:
 info:
   contact: {}
 paths:
+  /delivery/orders:
+    get:
+      consumes:
+      - application/json
+      description: (Delivery) Obtiene todas las órdenes con status 'Done' que solo
+        se mostrarán en la sección de repartidor
+      operationId: get-waiting-orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MultiOrderResponse'
+      summary: Obtener todas las órdenes esperando al repartidor
+    put:
+      consumes:
+      - application/json
+      description: (Repartidor) Actualiza el estado de una orden. True para 'En camino',
+        falso para 'Esperando al repartidor'.
+      operationId: set-order-status-delivery
+      parameters:
+      - description: Update Order Status Request
+        in: body
+        name: updateOrderStatusRequest
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.StandardResponse'
+      summary: Actualizar el estado de una orden en repartidor
   /kitchen/orders:
     get:
       consumes:

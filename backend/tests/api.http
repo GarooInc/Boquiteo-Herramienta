@@ -37,6 +37,16 @@ Content-Type: application/json
   "status": false
 }
 
+### PUT update order status from delivery
+PUT localhost:8080/delivery/orders HTTP/1.1
+accept: application/json
+Content-Type: application/json
+
+{
+  "order_id": 52086,
+  "status": true
+}
+
 ### POST /webhook with customer data
 POST localhost:8080/webhook HTTP/1.1
 accept: application/json

@@ -4,6 +4,57 @@
         "contact": {}
     },
     "paths": {
+        "/delivery/orders": {
+            "get": {
+                "description": "(Delivery) Obtiene todas las órdenes con status 'Done' que solo se mostrarán en la sección de repartidor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Obtener todas las órdenes esperando al repartidor",
+                "operationId": "get-waiting-orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MultiOrderResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "(Repartidor) Actualiza el estado de una orden. True para 'En camino', falso para 'Esperando al repartidor'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Actualizar el estado de una orden en repartidor",
+                "operationId": "set-order-status-delivery",
+                "parameters": [
+                    {
+                        "description": "Update Order Status Request",
+                        "name": "updateOrderStatusRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StandardResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/kitchen/orders": {
             "get": {
                 "description": "(Cocina) Obtiene todas las órdenes con status 'Confirmed' o 'Almost' que solo se mostrarán en la cocina",

@@ -406,3 +406,67 @@ func SetOrderStatusKitchen(c *gin.Context) {
 		Data:    nil,
 	})
 }
+
+// SetOrderStatusDelivery
+// @Summary Actualizar el estado de una orden en repartidor
+// @Description (Repartidor) Actualiza el estado de una orden. True para 'En camino', falso para 'Esperando al repartidor'.
+// @ID set-order-status-delivery
+// @Accept  json
+// @Produce  json
+// @Param updateOrderStatusRequest body UpdateOrderStatusRequest true "Update Order Status Request"
+// @Success 200 {object} responses.StandardResponse
+// @Router /delivery/orders [put]
+func SetOrderStatusDelivery(c *gin.Context) {
+	var updateOrderStatusRequest UpdateOrderStatusRequest
+	err := c.BindJSON(&updateOrderStatusRequest)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, responses.StandardResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid request." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// Obtener la orden
+	var order models.Order
+
+	collection := configs.GetCollection(configs.DB, "orders")
+	err = collection.FindOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}).Decode(&order)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while fetching order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	// status = true -> Delivering
+	// status = false -> Done
+	if updateOrderStatusRequest.Status {
+		order.Status = models.Delivering
+	} else {
+		order.Status = models.Done
+	}
+
+	// Actualizar la orden en la base de datos
+	_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status}})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Error while updating order." + err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, responses.StandardResponse{
+		Status:  http.StatusOK,
+		Message: "Order updated successfully to '" + order.Status + "'",
+		Data:    nil,
+	})
+}
