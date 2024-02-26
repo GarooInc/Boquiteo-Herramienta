@@ -409,7 +409,7 @@ func SetOrderStatusKitchen(c *gin.Context) {
 
 // SetOrderStatusDelivery
 // @Summary Actualizar el estado de una orden en repartidor
-// @Description (Repartidor) Actualiza el estado de una orden. True para 'En camino', falso para 'Esperando al repartidor'.
+// @Description (Repartidor) Actualiza el estado de una orden. True para 'Orden completada', falso para 'Esperando al repartidor'.
 // @ID set-order-status-delivery
 // @Accept  json
 // @Produce  json
@@ -447,7 +447,7 @@ func SetOrderStatusDelivery(c *gin.Context) {
 	// status = true -> Delivering
 	// status = false -> Done
 	if updateOrderStatusRequest.Status {
-		order.Status = models.Delivering
+		order.Status = models.Completed
 	} else {
 		order.Status = models.Done
 	}

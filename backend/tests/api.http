@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
   "order_id": 52086,
-  "status": false
+  "status": true
 }
 
 ### PUT update order status from delivery
