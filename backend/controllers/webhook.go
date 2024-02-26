@@ -160,7 +160,7 @@ func ReceiveWebhook(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
 			Status:  http.StatusInternalServerError,
-			Message: "Error while inserting the order to the database",
+			Message: "Error while inserting the order to the database." + err.Error(),
 			Data:    nil,
 		})
 		return
