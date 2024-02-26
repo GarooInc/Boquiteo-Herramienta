@@ -20,6 +20,7 @@ import (
 func ReceiveWebhook(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
+		log.Println("Error while reading the request body. " + err.Error())
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Error while reading the request body",
@@ -30,6 +31,7 @@ func ReceiveWebhook(c *gin.Context) {
 	var jsonBody map[string]interface{}
 
 	if err := json.Unmarshal(body, &jsonBody); err != nil {
+		log.Println("Error while parsing the request body. " + err.Error())
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Error while parsing the request body. " + err.Error(),
@@ -44,6 +46,7 @@ func ReceiveWebhook(c *gin.Context) {
 	if jsonOrderNumber, ok := jsonBody["order_number"]; ok {
 		orderNumber = int(jsonOrderNumber.(float64))
 	} else {
+		log.Println("Order number not found")
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Order number not found",
@@ -56,6 +59,7 @@ func ReceiveWebhook(c *gin.Context) {
 	if jsonTotalPrice, ok := jsonBody["total_price"]; ok {
 		totalPrice, err = strconv.ParseFloat(jsonTotalPrice.(string), 64)
 		if err != nil {
+			log.Println("Error while parsing the total price. " + err.Error())
 			c.JSON(http.StatusBadRequest, responses.StandardResponse{
 				Status:  http.StatusBadRequest,
 				Message: "Error while parsing the total price. " + err.Error(),
@@ -65,6 +69,7 @@ func ReceiveWebhook(c *gin.Context) {
 
 		}
 	} else {
+		log.Println("Total price not found")
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Total price not found",
@@ -77,6 +82,7 @@ func ReceiveWebhook(c *gin.Context) {
 	if jsonFirstName, ok := jsonBody["customer"].(map[string]interface{})["first_name"]; ok {
 		customer = jsonFirstName.(string)
 	} else {
+		log.Println("Customer first name not found")
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Customer first name not found",
@@ -87,6 +93,7 @@ func ReceiveWebhook(c *gin.Context) {
 	if jsonLastName, ok := jsonBody["customer"].(map[string]interface{})["last_name"]; ok {
 		customer += " " + jsonLastName.(string)
 	} else {
+		log.Println("Customer last name not found")
 		c.JSON(http.StatusBadRequest, responses.StandardResponse{
 			Status:  http.StatusBadRequest,
 			Message: "Customer last name not found",
@@ -103,6 +110,7 @@ func ReceiveWebhook(c *gin.Context) {
 			itemVendor := item.(map[string]interface{})["vendor"].(string)
 			itemPrice, err := strconv.ParseFloat(item.(map[string]interface{})["price"].(string), 64)
 			if err != nil {
+				log.Println("Error while parsing the item price. " + err.Error())
 				c.JSON(http.StatusBadRequest, responses.StandardResponse{
 					Status:  http.StatusBadRequest,
 					Message: "Error while parsing the item price. " + err.Error(),
