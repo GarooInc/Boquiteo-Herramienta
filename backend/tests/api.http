@@ -24,7 +24,7 @@ Content-Type: application/json
 {
   "order_id": 52086,
   "item_id": 0,
-  "item_ready": true
+  "item_ready": false
 }
 
 ### PUT update order status from kitchen
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
   "order_id": 52086,
-  "status": true
+  "status": false
 }
 
 ### PUT update order status from delivery
@@ -44,7 +44,7 @@ Content-Type: application/json
 
 {
   "order_id": 52086,
-  "status": true
+  "status": false
 }
 
 ### POST /webhook with customer data

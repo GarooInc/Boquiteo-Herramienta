@@ -105,10 +105,29 @@ func ReceiveWebhook(c *gin.Context) {
 	var lineItems []models.OrderItem // [{"name": "item1", "quantity": 1, "price": 10.00, "vendor": "vendor1"}, ...]
 	if jsonLineItems, ok := jsonBody["line_items"]; ok {
 		for i, item := range jsonLineItems.([]interface{}) {
-			itemName := item.(map[string]interface{})["title"].(string)
-			itemQuantity := item.(map[string]interface{})["quantity"].(float64)
-			itemVendor := item.(map[string]interface{})["vendor"].(string)
-			itemPrice, err := strconv.ParseFloat(item.(map[string]interface{})["price"].(string), 64)
+			var itemName, itemVendor string
+			var itemQuantity, itemPrice float64
+
+			itemNameInterface, itemNameExists := item.(map[string]interface{})["title"]            // String
+			itemQuantityInterface, itemQuantityExists := item.(map[string]interface{})["quantity"] // Float64
+			itemVendorInterface, itemVendorExists := item.(map[string]interface{})["vendor"]       // String
+			itemPriceInterface, itemPriceExists := item.(map[string]interface{})["price"]          // String
+
+			if !itemNameExists || !itemQuantityExists || !itemVendorExists || !itemPriceExists {
+				log.Println("Item " + strconv.Itoa(i) + " is missing some fields.")
+				c.JSON(http.StatusBadRequest, responses.StandardResponse{
+					Status:  http.StatusBadRequest,
+					Message: "Item " + strconv.Itoa(i) + " is missing some fields.",
+					Data:    nil,
+				})
+				return
+			}
+
+			itemName = itemNameInterface.(string)
+			itemQuantity = itemQuantityInterface.(float64)
+			itemVendor = itemVendorInterface.(string)
+			itemPrice, err = strconv.ParseFloat(itemPriceInterface.(string), 64)
+
 			if err != nil {
 				log.Println("Error while parsing the item price. " + err.Error())
 				c.JSON(http.StatusBadRequest, responses.StandardResponse{
