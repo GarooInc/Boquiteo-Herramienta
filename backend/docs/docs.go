@@ -36,7 +36,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "(Repartidor) Actualiza el estado de una orden. True para 'En camino', falso para 'Esperando al repartidor'.",
+                "description": "(Repartidor) Actualiza el estado de una orden. True para 'Orden completada', falso para 'Esperando al repartidor'.",
                 "consumes": [
                     "application/json"
                 ],
