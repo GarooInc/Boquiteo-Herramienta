@@ -6,8 +6,11 @@ import (
 	"Boquiteo-Backend/responses"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // GetCurrentOrders
@@ -355,6 +358,15 @@ func SetOrderStatusKitchen(c *gin.Context) {
 		return
 	}
 
+	if order.Status == models.Completed {
+		c.JSON(http.StatusBadRequest, responses.StandardResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Completed order cannot be updated on kitchen.",
+			Data:    nil,
+		})
+		return
+	}
+
 	// status = true -> Done
 	// status = false -> Almost / Confirmed
 	if updateOrderStatusRequest.Status {
@@ -371,6 +383,21 @@ func SetOrderStatusKitchen(c *gin.Context) {
 		}
 
 		order.Status = models.Done
+		order.TimeOrderFulfilled = primitive.NewDateTimeFromTime(time.Now().UTC())
+
+		// Actualizar la orden en la base de datos, registrando el tiempo en el que se completó
+		_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status, "time_order_fulfilled": order.TimeOrderFulfilled}})
+
+		if err != nil {
+			log.Println("Error while updating order." + err.Error())
+			c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "Error while updating order." + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
 	} else {
 		// Si hay al menos un item Listo, la orden pasa a 'Casi listo'. Si no, a 'Confirmado'
 		almost := false
@@ -386,18 +413,19 @@ func SetOrderStatusKitchen(c *gin.Context) {
 		} else {
 			order.Status = models.Confirmed
 		}
-	}
 
-	// Actualizar la orden en la base de datos
-	_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status}})
+		// Actualizar la orden en la base de datos, eliminando el campo time_order_fulfilled que se vuelve inválido
+		_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$unset": bson.M{"time_order_fulfilled": ""}})
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
-			Status:  http.StatusInternalServerError,
-			Message: "Error while updating order." + err.Error(),
-			Data:    nil,
-		})
-		return
+		if err != nil {
+			log.Println("Error while updating order." + err.Error())
+			c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "Error while updating order." + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, responses.StandardResponse{
@@ -444,24 +472,49 @@ func SetOrderStatusDelivery(c *gin.Context) {
 		return
 	}
 
+	if order.Status == models.Confirmed || order.Status == models.Almost {
+		c.JSON(http.StatusBadRequest, responses.StandardResponse{
+			Status:  http.StatusBadRequest,
+			Message: "Order must be 'Done' before updating from Delivery.",
+			Data:    nil,
+		})
+		return
+
+	}
+
 	// status = true -> Delivering
 	// status = false -> Done
 	if updateOrderStatusRequest.Status {
 		order.Status = models.Completed
+		order.TimeOrderPickup = primitive.NewDateTimeFromTime(time.Now().UTC())
+
+		// Actualizar la orden en la base de datos
+		_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status, "time_order_pickup": order.TimeOrderPickup}})
+
+		if err != nil {
+			log.Println("Error while updating order." + err.Error())
+			c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "Error while updating order." + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
 	} else {
 		order.Status = models.Done
-	}
 
-	// Actualizar la orden en la base de datos
-	_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$set": bson.M{"status": order.Status}})
+		// Actualizar la orden en la base de datos, eliminando el campo time_order_pickup que se vuelve inválido
+		_, err = collection.UpdateOne(c, bson.M{"order_number": updateOrderStatusRequest.OrderId}, bson.M{"$unset": bson.M{"time_order_pickup": ""}})
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
-			Status:  http.StatusInternalServerError,
-			Message: "Error while updating order." + err.Error(),
-			Data:    nil,
-		})
-		return
+		if err != nil {
+			log.Println("Error while updating order." + err.Error())
+			c.JSON(http.StatusInternalServerError, responses.StandardResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "Error while updating order." + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, responses.StandardResponse{
