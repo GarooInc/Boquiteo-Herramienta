@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -158,6 +159,7 @@ func ReceiveWebhook(c *gin.Context) {
 	collection := configs.GetCollection(configs.DB, "orders")
 	insertResult, err := collection.InsertOne(c, newOrder)
 	if err != nil {
+		log.Println("Error while inserting the order to the database." + err.Error())
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
 			Status:  http.StatusInternalServerError,
 			Message: "Error while inserting the order to the database." + err.Error(),
