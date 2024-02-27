@@ -4,6 +4,7 @@ import (
 	"Boquiteo-Backend/configs"
 	"Boquiteo-Backend/models"
 	"Boquiteo-Backend/responses"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,12 @@ func ReceiveWebhook(c *gin.Context) {
 			Data:    nil,
 		})
 		return
+	}
+
+	var out bytes.Buffer
+	err = json.Indent(&out, body, "\t", "  ")
+	if err == nil {
+		log.Printf("\n%s\n", out)
 	}
 
 	// TODO implement logging
@@ -123,6 +130,10 @@ func ReceiveWebhook(c *gin.Context) {
 				return
 			}
 
+			if itemVendorInterface == nil {
+				itemVendorInterface = "Indefinido"
+			}
+
 			itemName = itemNameInterface.(string)
 			itemQuantity = itemQuantityInterface.(float64)
 			itemVendor = itemVendorInterface.(string)
@@ -155,14 +166,29 @@ func ReceiveWebhook(c *gin.Context) {
 	// get jsonBody["customer"]["default_address"]
 	if jsonDefaultAddress, ok := jsonBody["customer"].(map[string]interface{})["default_address"]; ok {
 		// if exists, get address1 and address2 and concatenate them to address
-		if jsonAddress1, ok := jsonDefaultAddress.(map[string]interface{})["address1"]; ok {
-			// strip the address of any commas and blank spaces
-			address = jsonAddress1.(string)
+		//if jsonAddress1, ok := jsonDefaultAddress.(map[string]interface{})["address1"]; ok {
+		//	// strip the address of any commas and blank spaces
+		//	address = jsonAddress1.(string)
+		//}
+		//if jsonAddress2, ok := jsonDefaultAddress.(map[string]interface{})["address2"]; ok {
+		//	address += ", " + jsonAddress2.(string)
+		//}
+		//if jsonCity, ok := jsonDefaultAddress.(map[string]interface{})["city"]; ok {
+		//	address += ". " + jsonCity.(string)
+		//}
+		jsonAddress1, jsonAddress1Exists := jsonDefaultAddress.(map[string]interface{})["address1"]
+		jsonAddress2, jsonAddress2Exists := jsonDefaultAddress.(map[string]interface{})["address2"]
+		jsonCity, jsonCityExists := jsonDefaultAddress.(map[string]interface{})["city"]
+
+		if jsonAddress1Exists && jsonAddress1 != nil {
+			address += jsonAddress1.(string)
 		}
-		if jsonAddress2, ok := jsonDefaultAddress.(map[string]interface{})["address2"]; ok {
+
+		if jsonAddress2Exists && jsonAddress2 != nil {
 			address += ", " + jsonAddress2.(string)
 		}
-		if jsonCity, ok := jsonDefaultAddress.(map[string]interface{})["city"]; ok {
+
+		if jsonCityExists && jsonCity != nil {
 			address += ". " + jsonCity.(string)
 		}
 	}
