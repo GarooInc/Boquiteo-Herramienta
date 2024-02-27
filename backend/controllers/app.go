@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,8 +26,9 @@ func GetCurrentOrders(c *gin.Context) {
 	var orders []models.Order
 
 	collection := configs.GetCollection(configs.DB, "orders")
+	opts := options.Find().SetSort(bson.D{{"order_number", -1}})
 
-	cursor, err := collection.Find(c, bson.M{})
+	cursor, err := collection.Find(c, bson.M{}, opts)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
@@ -49,7 +51,7 @@ func GetCurrentOrders(c *gin.Context) {
 	var ordersFiltered []models.Order
 
 	for _, order := range orders {
-		if order.Status != "cancelled" && order.Status != "completed" {
+		if order.Status != models.Cancelled {
 			order.ShopifyDetails = nil // No se envía la información de Shopify
 			ordersFiltered = append(ordersFiltered, order)
 		}
@@ -75,7 +77,9 @@ func GetPendingOrders(c *gin.Context) {
 	var orders []models.Order
 
 	collection := configs.GetCollection(configs.DB, "orders")
-	cursor, err := collection.Find(c, bson.M{"status": bson.M{"$in": []string{models.Confirmed, models.Almost}}})
+	opts := options.Find().SetSort(bson.D{{"order_number", -1}})
+
+	cursor, err := collection.Find(c, bson.M{"status": bson.M{"$in": []string{models.Confirmed, models.Almost}}}, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
 			Status:  http.StatusInternalServerError,
@@ -121,7 +125,9 @@ func GetWaitingOrders(c *gin.Context) {
 	var orders []models.Order
 
 	collection := configs.GetCollection(configs.DB, "orders")
-	cursor, err := collection.Find(c, bson.M{"status": models.Done})
+	opts := options.Find().SetSort(bson.D{{"order_number", -1}})
+
+	cursor, err := collection.Find(c, bson.M{"status": models.Done}, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
 			Status:  http.StatusInternalServerError,
