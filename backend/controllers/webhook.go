@@ -147,6 +147,23 @@ func ReceiveWebhook(c *gin.Context) {
 				return
 			}
 
+			var itemVariant string
+			var itemOptions []string
+
+			if jsonVariant, ok := item.(map[string]interface{})["variant_title"]; ok && jsonVariant != nil {
+				itemVariant = jsonVariant.(string)
+			}
+
+			// verify item[options], there the options are listed as an array of objects {name: "option_name", value: "option_value"}
+			if jsonOptions, ok := item.(map[string]interface{})["properties"]; ok && jsonOptions != nil {
+				for _, option := range jsonOptions.([]interface{}) {
+					optionName := option.(map[string]interface{})["name"]
+					optionValue := option.(map[string]interface{})["value"]
+					fmt.Println(optionName, optionValue)
+					itemOptions = append(itemOptions, optionName.(string)+": "+optionValue.(string))
+				}
+			}
+
 			item := models.OrderItem{
 				Item:     i,
 				Name:     itemName,
@@ -154,6 +171,8 @@ func ReceiveWebhook(c *gin.Context) {
 				Price:    itemPrice,
 				Vendor:   itemVendor,
 				Status:   models.ItemPending,
+				Variant:  itemVariant,
+				Options:  itemOptions,
 			}
 
 			lineItems = append(lineItems, item)
