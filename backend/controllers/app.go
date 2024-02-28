@@ -389,7 +389,7 @@ func SetOrderStatusKitchen(c *gin.Context) {
 			// show in message how many items are not ready
 			c.JSON(http.StatusBadRequest, responses.StandardResponse{
 				Status:  http.StatusBadRequest,
-				Message: fmt.Sprintf("Hay %d items que no están listos", len(itemsNotReady)),
+				Message: fmt.Sprintf("There are %d items not ready.", len(itemsNotReady)),
 				Data:    map[string]interface{}{"items": itemsNotReady},
 			})
 			return
