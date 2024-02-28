@@ -4,6 +4,7 @@ import (
 	"Boquiteo-Backend/configs"
 	"Boquiteo-Backend/models"
 	"Boquiteo-Backend/responses"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -377,15 +378,21 @@ func SetOrderStatusKitchen(c *gin.Context) {
 	// status = false -> Almost / Confirmed
 	if updateOrderStatusRequest.Status {
 		// Verificar que todos los items estén listos
+		var itemsNotReady []models.OrderItem
 		for _, item := range order.LineItems {
 			if item.Status != models.ItemReady {
-				c.JSON(http.StatusBadRequest, responses.StandardResponse{
-					Status:  http.StatusBadRequest,
-					Message: "Not all items are ready.",
-					Data:    nil,
-				})
-				return
+				itemsNotReady = append(itemsNotReady, item)
 			}
+		}
+
+		if len(itemsNotReady) > 0 {
+			// show in message how many items are not ready
+			c.JSON(http.StatusBadRequest, responses.StandardResponse{
+				Status:  http.StatusBadRequest,
+				Message: fmt.Sprintf("Hay %d items que no están listos", len(itemsNotReady)),
+				Data:    map[string]interface{}{"items": itemsNotReady},
+			})
+			return
 		}
 
 		order.Status = models.Done
