@@ -22,6 +22,7 @@ type Order struct {
 	Customer           string             `json:"customer" bson:"customer"`
 	LineItems          []OrderItem        `json:"line_items" bson:"line_items"`
 	Address            string             `json:"address" bson:"address"`
+	Comments           string             `json:"comments,omitempty" bson:"comments,omitempty"`
 	TimeOrderConfirmed primitive.DateTime `json:"time_order_confirmed" bson:"time_order_confirmed" swaggertype:"string" format:"date-time"`
 	TimeOrderFulfilled primitive.DateTime `json:"time_order_fulfilled,omitempty" bson:"time_order_fulfilled,omitempty" swaggertype:"string" format:"date-time"`
 	TimeOrderPickup    primitive.DateTime `json:"time_order_pickup,omitempty" bson:"time_order_pickup,omitempty" swaggertype:"string" format:"date-time"`
@@ -29,10 +30,12 @@ type Order struct {
 }
 
 type OrderItem struct {
-	Item     int     `json:"item" bson:"item"` // ID del item dentro de la orden
-	Name     string  `json:"name" bson:"name"`
-	Quantity float64 `json:"quantity" bson:"quantity"`
-	Price    float64 `json:"price" bson:"price"`
-	Vendor   string  `json:"vendor" bson:"vendor"`
-	Status   string  `json:"status" bson:"status"`
+	Item     int      `json:"item" bson:"item"` // ID del item dentro de la orden
+	Name     string   `json:"name" bson:"name"`
+	Quantity float64  `json:"quantity" bson:"quantity"`
+	Price    float64  `json:"price" bson:"price"`
+	Vendor   string   `json:"vendor" bson:"vendor"`
+	Status   string   `json:"status" bson:"status"`
+	Variant  string   `json:"variant,omitempty" bson:"variant,omitempty"`
+	Options  []string `json:"options,omitempty" bson:"options,omitempty"`
 }

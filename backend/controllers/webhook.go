@@ -44,10 +44,8 @@ func ReceiveWebhook(c *gin.Context) {
 	var out bytes.Buffer
 	err = json.Indent(&out, body, "\t", "  ")
 	if err == nil {
-		log.Printf("\n%s\n", out)
+		fmt.Printf("\n%s\n", out)
 	}
-
-	// TODO implement logging
 
 	var orderNumber int
 	if jsonOrderNumber, ok := jsonBody["order_number"]; ok {
@@ -163,19 +161,7 @@ func ReceiveWebhook(c *gin.Context) {
 	}
 
 	var address string
-	// get jsonBody["customer"]["default_address"]
 	if jsonDefaultAddress, ok := jsonBody["customer"].(map[string]interface{})["default_address"]; ok {
-		// if exists, get address1 and address2 and concatenate them to address
-		//if jsonAddress1, ok := jsonDefaultAddress.(map[string]interface{})["address1"]; ok {
-		//	// strip the address of any commas and blank spaces
-		//	address = jsonAddress1.(string)
-		//}
-		//if jsonAddress2, ok := jsonDefaultAddress.(map[string]interface{})["address2"]; ok {
-		//	address += ", " + jsonAddress2.(string)
-		//}
-		//if jsonCity, ok := jsonDefaultAddress.(map[string]interface{})["city"]; ok {
-		//	address += ". " + jsonCity.(string)
-		//}
 		jsonAddress1, jsonAddress1Exists := jsonDefaultAddress.(map[string]interface{})["address1"]
 		jsonAddress2, jsonAddress2Exists := jsonDefaultAddress.(map[string]interface{})["address2"]
 		jsonCity, jsonCityExists := jsonDefaultAddress.(map[string]interface{})["city"]
@@ -194,6 +180,12 @@ func ReceiveWebhook(c *gin.Context) {
 	}
 	address = strings.ReplaceAll(address, "  ", " ") // replace double spaces with single space
 
+	var comment string
+	if jsonComment, ok := jsonBody["note"]; ok && jsonComment != nil && jsonComment.(string) != "None" {
+		fmt.Println("Comment: " + jsonComment.(string))
+		comment = jsonComment.(string)
+	}
+
 	var orderConfirmedTime = primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond))
 
 	// Insertar a la base de datos
@@ -207,6 +199,7 @@ func ReceiveWebhook(c *gin.Context) {
 	newOrder.Address = address
 	newOrder.TimeOrderConfirmed = orderConfirmedTime
 	newOrder.ShopifyDetails = jsonBody
+	newOrder.Comments = comment
 
 	// Insertar a la base de datos
 	collection := configs.GetCollection(configs.DB, "orders")
