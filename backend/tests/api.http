@@ -961,6 +961,7 @@ Content-Type: application/json
   "location_id":36285481040,
   "merchant_of_record_app_id":"None",
   "name":"#52086",
+  "note":"Comentario de prueba para una orden",
   "note_attributes":[
 
   ],
