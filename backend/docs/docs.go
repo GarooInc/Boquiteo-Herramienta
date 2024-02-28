@@ -237,6 +237,9 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "comments": {
+                    "type": "string"
+                },
                 "customer": {
                     "type": "string"
                 },
@@ -280,6 +283,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "price": {
                     "type": "number"
                 },
@@ -287,6 +296,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "variant": {
                     "type": "string"
                 },
                 "vendor": {

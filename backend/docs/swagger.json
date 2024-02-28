@@ -226,6 +226,9 @@
                 "address": {
                     "type": "string"
                 },
+                "comments": {
+                    "type": "string"
+                },
                 "customer": {
                     "type": "string"
                 },
@@ -269,6 +272,12 @@
                 "name": {
                     "type": "string"
                 },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "price": {
                     "type": "number"
                 },
@@ -276,6 +285,9 @@
                     "type": "number"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "variant": {
                     "type": "string"
                 },
                 "vendor": {
