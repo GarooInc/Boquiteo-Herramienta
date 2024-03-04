@@ -198,13 +198,17 @@ func GetOrderById(c *gin.Context) {
 	}
 
 	var responseOrder = models.Order{
-		ID:          order.ID,
-		OrderNumber: order.OrderNumber,
-		Status:      order.Status,
-		TotalPrice:  order.TotalPrice,
-		Customer:    order.Customer,
-		LineItems:   order.LineItems,
-		Address:     order.Address,
+		ID:                 order.ID,
+		OrderNumber:        order.OrderNumber,
+		Status:             order.Status,
+		TotalPrice:         order.TotalPrice,
+		Customer:           order.Customer,
+		LineItems:          order.LineItems,
+		Address:            order.Address,
+		Comments:           order.Comments,
+		TimeOrderConfirmed: order.TimeOrderConfirmed,
+		TimeOrderFulfilled: order.TimeOrderFulfilled,
+		TimeOrderPickup:    order.TimeOrderPickup,
 	}
 
 	c.JSON(http.StatusOK, responses.OrderResponse{

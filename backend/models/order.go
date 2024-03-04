@@ -26,7 +26,7 @@ type Order struct {
 	TimeOrderConfirmed primitive.DateTime `json:"time_order_confirmed" bson:"time_order_confirmed" swaggertype:"string" format:"date-time"`
 	TimeOrderFulfilled primitive.DateTime `json:"time_order_fulfilled,omitempty" bson:"time_order_fulfilled,omitempty" swaggertype:"string" format:"date-time"`
 	TimeOrderPickup    primitive.DateTime `json:"time_order_pickup,omitempty" bson:"time_order_pickup,omitempty" swaggertype:"string" format:"date-time"`
-	ShopifyDetails     interface{}        `json:"shopify_details" bson:"shopify_details"`
+	ShopifyDetails     interface{}        `json:"shopify_details,omitempty" bson:"shopify_details"`
 }
 
 type OrderItem struct {
