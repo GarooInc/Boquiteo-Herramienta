@@ -1491,7 +1491,7 @@ Content-Type: application/json
       "product_id":6568265515088,
       "properties":[
         {
-            "name":"Papas Fritas",
+            "name":"Papas Fritas:",
             "value":"Normal"
         }
       ],

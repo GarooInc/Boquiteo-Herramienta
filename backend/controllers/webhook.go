@@ -160,7 +160,13 @@ func ReceiveWebhook(c *gin.Context) {
 					optionName := option.(map[string]interface{})["name"]
 					optionValue := option.(map[string]interface{})["value"]
 					fmt.Println(optionName, optionValue)
-					itemOptions = append(itemOptions, optionName.(string)+" "+optionValue.(string))
+
+					// verificar si optionname terminan en ':'
+					if strings.HasSuffix(optionName.(string), ":") {
+						optionName = optionName.(string)[:len(optionName.(string))-1]
+					}
+
+					itemOptions = append(itemOptions, optionName.(string)+": "+optionValue.(string))
 				}
 			}
 
