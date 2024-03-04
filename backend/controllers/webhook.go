@@ -160,7 +160,7 @@ func ReceiveWebhook(c *gin.Context) {
 					optionName := option.(map[string]interface{})["name"]
 					optionValue := option.(map[string]interface{})["value"]
 					fmt.Println(optionName, optionValue)
-					itemOptions = append(itemOptions, optionName.(string)+": "+optionValue.(string))
+					itemOptions = append(itemOptions, optionName.(string)+" "+optionValue.(string))
 				}
 			}
 
