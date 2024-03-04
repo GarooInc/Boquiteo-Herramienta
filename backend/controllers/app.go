@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
@@ -21,15 +22,34 @@ import (
 // @ID get-current-orders
 // @Accept  json
 // @Produce  json
+// @Param debug query int false "Modo Debug: 1 para obtener todas las órdenes, 0 para obtener las órdenes de las últimas 24 horas"
 // @Success 200 {object} responses.MultiOrderResponse
 // @Router /orders [get]
 func GetCurrentOrders(c *gin.Context) {
 	var orders []models.Order
 
+	debug := c.Query("debug")
+
+	var cursor *mongo.Cursor
+	var bsonFilter bson.M
+
+	if debug == "1" {
+		// Modo Debug: regresar todas las ordenes
+		bsonFilter = bson.M{}
+	} else {
+		// Modo Producción: regresar todas las ordenes de las últimas 24 horas
+		currentTime := time.Now().UTC()
+		oneDayAgo := currentTime.AddDate(0, 0, -1)
+		oneDayAgoPrimitive := primitive.NewDateTimeFromTime(oneDayAgo)
+
+		// Filtrar las órdenes de las últimas 24 horas
+		bsonFilter = bson.M{"time_order_confirmed": bson.M{"$gte": oneDayAgoPrimitive}}
+	}
+
 	collection := configs.GetCollection(configs.DB, "orders")
 	opts := options.Find().SetSort(bson.D{{"order_number", -1}})
 
-	cursor, err := collection.Find(c, bson.M{}, opts)
+	cursor, err := collection.Find(c, bsonFilter, opts)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responses.StandardResponse{
@@ -57,6 +77,8 @@ func GetCurrentOrders(c *gin.Context) {
 			ordersFiltered = append(ordersFiltered, order)
 		}
 	}
+
+	fmt.Println(len(ordersFiltered))
 
 	c.JSON(http.StatusOK, responses.MultiOrderResponse{
 		Status:  http.StatusOK,

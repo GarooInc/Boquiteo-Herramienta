@@ -2,7 +2,7 @@ localhost:8080/api/
 Accept: application/json
 
 ### GET current orders
-GET localhost:8080/orders HTTP/1.1
+GET localhost:8080/orders?debug=0 HTTP/1.1
 accept: application/json
 
 ### GET current orders for kitchen
